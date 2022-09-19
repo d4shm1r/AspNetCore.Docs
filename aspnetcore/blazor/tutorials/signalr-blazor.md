@@ -981,6 +981,11 @@ Create a `Hubs` (plural) folder and add the following `ChatHub` class (`Hubs/Cha
 1. In `Startup.Configure`:
 
    * Use Response Compression Middleware at the top of the processing pipeline's configuration.
+   
+   ```csharp
+   app.UseResponseCompression();
+   ```
+   
    * Between the endpoints for mapping the Blazor hub and the client-side fallback, add an endpoint for the hub.
 
    [!code-csharp[](signalr-blazor/samples/5.0/BlazorServerSignalRApp/Startup.cs?name=snippet_Configure&highlight=3,23)]
