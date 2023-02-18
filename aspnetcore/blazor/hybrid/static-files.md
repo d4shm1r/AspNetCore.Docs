@@ -5,7 +5,7 @@ description: Learn how to consume static asset files in Blazor Hybrid apps.
 monikerRange: '>= aspnetcore-6.0'
 ms.author: riande
 ms.custom: mvc
-ms.date: 05/23/2022
+ms.date: 12/06/2022
 uid: blazor/hybrid/static-files
 ---
 # ASP.NET Core Blazor Hybrid static files
@@ -33,7 +33,7 @@ This is text from a static text file resource.
 
 The following Razor component:
 
-* Calls `Microsoft.Maui.Storage.FileSystem.OpenAppPackageFileAsync` to obtain a <xref:System.IO.Stream> for the resource.
+* Calls <xref:Microsoft.Maui.Storage.FileSystem.OpenAppPackageFileAsync%2A> to obtain a <xref:System.IO.Stream> for the resource.
 * Reads the <xref:System.IO.Stream> with a <xref:System.IO.StreamReader>.
 * Calls <xref:System.IO.StreamReader.ReadToEndAsync%2A?displayProperty=nameWithType> to read the file.
 
@@ -176,9 +176,19 @@ In the following example component:
 
 ## Static assets limited to Razor components
 
-In scenarios where the app only uses static assets in Razor components, the static assets can be supplied from the app's web root (`wwwroot` folder).
+A `BlazorWebView` control has a configured host file (:::no-loc text="HostPage":::), typically `wwwroot/index.html`. The :::no-loc text="HostPage"::: path is relative to the project. All static web assets (scripts, CSS files, images, and other files) that are referenced from a `BlazorWebView` are relative to its configured :::no-loc text="HostPage":::.
 
-Place assets into the `wwwroot` folder. The example in this section uses a static text file.
+Static web assets from a [Razor class library (RCL)](xref:razor-pages/ui-class) use special paths: `_content/{PACKAGE ID}/{PATH AND FILE NAME}`. The `{PACKAGE ID}` placeholder is the library's [package ID](/nuget/create-packages/creating-a-package-msbuild#set-properties). The package ID defaults to the project's assembly name if `<PackageId>` isn't specified in the project file. The `{PATH AND FILE NAME}` placeholder is path and file name under `wwwroot`. These paths are logically subpaths of the app's `wwwroot` folder, although they're actually coming from other packages or projects. Component-specific CSS style bundles are also built at the root of the `wwwroot` folder.
+
+The web root of the :::no-loc text="HostPage"::: determines which subset of static assets are available:
+
+* `wwwroot/index.html` (*Recommended*): All assets in the app's `wwwroot` folder are available (for example: `wwwroot/image.png` is available from `/image.png`), including subfolders (for example: `wwwroot/subfolder/image.png` is available from `/subfolder/image.png`). RCL static assets in the RCL's `wwwroot` folder are available (for example: `wwwroot/image.png` is available from the path `_content/{PACKAGE ID}/image.png`), including subfolders (for example: `wwwroot/subfolder/image.png` is available from the path `_content/{PACKAGE ID}/subfolder/image.png`).
+* `wwwroot/{PATH}/index.html`: All assets in the app's `wwwroot/{PATH}` folder are available using app web root relative paths. RCL static assets in `wwwroot/{PATH}` are ***not available*** because they would be in a non-existent theoretical location, such as `../../_content/{PACKAGE ID}/{PATH}`, which is ***not a supported relative path***.
+* `wwwroot/_content/{PACKAGE ID}/index.html`: All assets in the RCL's `wwwroot/{PATH}` folder are available using RCL web root relative paths. The app's static assets in `wwwroot/{PATH}` are ***not available*** because they would be in a non-existent theoretical location, such as `../../{PATH}`, which is ***not a supported relative path***.
+
+For most apps, we recommend placing the :::no-loc text="HostPage"::: at the root of the `wwwroot` folder of the app, which provides the greatest flexibility for supplying static assets from the app, RCLs, and via subfolders of the app and RCLs.
+
+The following examples demonstrate referencing static assets from the app's web root (`wwwroot` folder) with a :::no-loc text="HostPage"::: rooted in the `wwwroot` folder.
 
 `wwwroot/data.txt`:
 
@@ -186,7 +196,13 @@ Place assets into the `wwwroot` folder. The example in this section uses a stati
 This is text from a static text file resource.
 ```
 
-In **Solution Explorer**, select the `data.txt` file. In the file's **Properties**, set **Copy to Output Directory** to **Copy if newer**.
+`wwwroot/scripts.js`:
+
+```javascript
+export function showPrompt(message) {
+  return prompt(message, 'Type anything here');
+}
+```
 
 The following Jeep&reg; image is also used in this section's example. You can right-click the following image to save it locally for use in a local test app.
 
@@ -194,14 +210,12 @@ The following Jeep&reg; image is also used in this section's example. You can ri
 
 ![Jeep YJ&reg;](~/blazor/components/class-libraries/_static/jeep-yj.png)
 
-> [!NOTE]
-> For images in `wwwroot`, the **Copy to Output Directory** property uses the default setting of **Do not copy**.
-
 In a Razor component:
 
 * The static text file contents can be read using the following techniques:
-  * .NET MAUI: [:::no-loc text=".NET MAUI file system helpers":::](/dotnet/maui/platform-integration/storage/file-system-helpers) (`Microsoft.Maui.Storage.FileSystem.OpenAppPackageFileAsync`)
+  * .NET MAUI: [:::no-loc text=".NET MAUI file system helpers":::](/dotnet/maui/platform-integration/storage/file-system-helpers) (<xref:Microsoft.Maui.Storage.FileSystem.OpenAppPackageFileAsync%2A>)
   * WPF and Windows Forms: <xref:System.IO.StreamReader.ReadToEndAsync%2A?displayProperty=nameWithType>
+* JavaScript files are available at logical subpaths of `wwwroot` using `./` paths.
 * The image can be the source attribute (`src`) of an image tag (`<img>`).
 
 `StaticAssetExample2.razor`:
@@ -209,11 +223,25 @@ In a Razor component:
 ```razor
 @page "/static-asset-example-2"
 @using Microsoft.Extensions.Logging
+@implements IAsyncDisposable
+@inject IJSRuntime JS
 @inject ILogger<StaticAssetExample2> Logger
 
 <h1>Static Asset Example 2</h1>
 
+<h2>Read a file</h2>
+
 <p>@dataResourceText</p>
+
+<h2>Call JavaScript</h2>
+
+<p>
+    <button @onclick="TriggerPrompt">Trigger browser window prompt</button>
+</p>
+
+<p>@result</p>
+
+<h2>Show an image</h2>
 
 <p><img alt="1991 Jeep YJ" src="/jeep-yj.png" /></p>
 
@@ -223,7 +251,9 @@ In a Razor component:
 </p>
 
 @code {
-    public string dataResourceText = "Loading resource ...";
+    private string dataResourceText = "Loading resource ...";
+    private IJSObjectReference module;
+    private string result;
 
     protected override async Task OnInitializedAsync()
     {   
@@ -235,6 +265,32 @@ In a Razor component:
         {
             dataResourceText = "Data file not found.";
             Logger.LogError(ex, "'wwwroot/data.txt' not found.");
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            module = await JS.InvokeAsync<IJSObjectReference>("import",
+                "./scripts.js");
+        }
+    }
+
+    private async Task TriggerPrompt()
+    {
+        result = await Prompt("Provide some text");
+    }
+
+    public async ValueTask<string> Prompt(string message) =>
+        module is not null ?
+            await module.InvokeAsync<string>("showPrompt", message) : null;
+
+    async ValueTask IAsyncDisposable.DisposeAsync()
+    {
+        if (module is not null)
+        {
+            await module.DisposeAsync();
         }
     }
 }
@@ -261,6 +317,23 @@ private async Task<string> ReadData()
 
     return await reader.ReadToEndAsync();
 }
+```
+
+[Collocated JavaScript files](xref:blazor/js-interop/index#load-a-script-from-an-external-javascript-file-js-collocated-with-a-component) are also accessible at logical subpaths of `wwwroot`. Instead of using the script described earlier for the `showPrompt` function in `wwwroot/scripts.js`, the following collocated JavaScript file for the `StaticAssetExample2` component also makes the function available.
+
+`Pages/StaticAssetExample2.razor.js`:
+
+```javascript
+export function showPrompt(message) {
+  return prompt(message, 'Type anything here');
+}
+```
+
+Modify the module object reference in the `StaticAssetExample2` component to use the collocated JavaScript file path (`./Pages/StaticAssetExample2.razor.js`):
+
+```csharp
+module = await JS.InvokeAsync<IJSObjectReference>("import", 
+    "./Pages/StaticAssetExample2.razor.js");
 ```
 
 ## Trademarks

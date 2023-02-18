@@ -11,7 +11,7 @@ ms.date: 8/31/2022
 
 Apps deployed to Azure that experience intermittent high demand benefit from scalability to meet demand. Scalable apps can scale out to ensure capacity during workload peaks and then scale down automatically when the peak drops, which can lower costs. Horizontal scaling (scaling out) adds new instances of a resource, such as VMs or database replicas. This article demonstrates how to deploy a horizontally scalable ASP.NET Core app to [Azure container apps](/azure/container-apps/overview) by completing the following tasks:
 
-1. [Setup the sample project](#set-up-the-sample-project)
+1. [Set up the sample project](#set-up-the-sample-project)
 1. [Deploy the app to Azure Container Apps](#deploy-the-app-to-azure-container-apps)
 1. [Scale and troubleshoot the app](#scale-and-troubleshoot-the-app)
 1. [Create the Azure Services](#create-the-azure-services)
@@ -44,7 +44,7 @@ The sample app uses a search form to browse GitHub repositories by name. The for
 
 #### Test the app
 
-1. Launch the app in Visual Studio. The project includes a Docker file, which means an the arrow next to the run button can be selected to start the app using either a Docker Desktop setup or the standard ASP.NET Core local web server.
+1. Launch the app in Visual Studio. The project includes a Docker file, which means that the arrow next to the run button can be selected to start the app using either a Docker Desktop setup or the standard ASP.NET Core local web server.
 
 Use the search form to browse for GitHub repositories by name.
 
@@ -115,7 +115,7 @@ It's not immediately apparent why the search requests are failing. The browser t
 
 1. In the query editor, compose a basic query to search the **ContainerAppConsoleLogs_CL Logs** table for recent exceptions, such as the following script:
 
-    ```sql
+    ```KQL
     ContainerAppConsoleLogs_CL
     | where Log_s contains "exception"
     | sort by TimeGenerated desc
@@ -173,7 +173,7 @@ Create a key vault to hold the keys that protect the data in the blob storage co
 1. On the key vault listing page, select **+ Create**.
 1. On the **Basics** tab, enter the following values:
     * **Subscription**: Select the same subscription that was previously selected.
-    * **Resource Group**: Select the *msdocs-scalable-razor* resource group previously created .
+    * **Resource Group**: Select the *msdocs-scalable-razor* resource group previously created.
     * **Key Vault name**: Enter the name *scalablerazorvaultXXXX*.
     * **Region**: Select a region near your location.
 1. Leave the rest of the settings at their default, and then select **Review + create**. Wait for Azure to validate your settings, and then select **Create**.
@@ -257,8 +257,9 @@ The preceding changes allow the app to manage data protection using a centralize
 
 Update the placeholders in `AzureURIs` section of the `appsettings.json` file to include the following:
 
-1. Replace the `<storage-account-name>` placeholder with the name of the `scalablerazorstorageXXXX` account created.
-1. Replace the `<key-vault-name>` placeholder with the name of the `scalablerazorvaultXXXX` key vault created.
+1. Replace the `<storage-account-name>` placeholder with the name of the `scalablerazorstorageXXXX` storage account.
+1. Replace the `<container-name>` placeholder with the name of the `scalablerazorkeys` storage container.
+1. Replace the `<key-vault-name>` placeholder with the name of the `scalablerazorvaultXXXX` key vault.
 1. Replace the `<key-name>` placeholder in the key vault URI with the `razorkey` name created previously.
 
     :::code language="csharp" source="~/../AspNetCore.Docs.Samples/tutorials/scalable-razor-apps/end/appsettings.json" highlight="9-12":::

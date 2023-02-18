@@ -38,6 +38,7 @@ Create a hub by declaring a class that inherits from <xref:Microsoft.AspNetCore.
 > Hubs are [transient](/dotnet/core/extensions/dependency-injection#transient):
 >
 > * Don't store state in a property of the hub class. Each hub method call is executed on a new hub instance.
+> * Don't instantiate a hub directly via dependency injection. To send messages to a client from elsewhere in your application use an [`IHubContext`](xref:signalr/hubcontext).
 > * Use `await` when calling asynchronous methods that depend on the hub staying alive. For example, a method such as `Clients.All.SendAsync(...)` can fail if it's called without `await` and the hub method completes before `SendAsync` finishes.
 
 ## The Context object
@@ -158,6 +159,7 @@ If an exceptional condition must be propagated to the client, use the <xref:Micr
 * <xref:signalr/introduction>
 * <xref:signalr/javascript-client>
 * <xref:signalr/publish-to-azure-web-app>
+* [SignalR Hub Protocol](https://github.com/dotnet/aspnetcore/blob/main/src/SignalR/docs/specs/HubProtocol.md)
 
 :::moniker-end
 
@@ -207,6 +209,7 @@ You can specify a return type and parameters, including complex types and arrays
 > Hubs are transient:
 >
 > * Don't store state in a property on the hub class. Every hub method call is executed on a new hub instance.
+> * Don't instantiate a hub directly via dependency injection. To send messages to a client from elsewhere in your application use an [`IHubContext`](xref:signalr/hubcontext).
 > * Use `await` when calling asynchronous methods that depend on the hub staying alive. For example, a method such as `Clients.All.SendAsync(...)` can fail if it's called without `await` and the hub method completes before `SendAsync` finishes.
 
 ## The Context object
@@ -380,6 +383,7 @@ You can specify a return type and parameters, including complex types and arrays
 > Hubs are transient:
 >
 > * Don't store state in a property on the hub class. Every hub method call is executed on a new hub instance.
+> * Don't instantiate a hub directly via dependency injection. To send messages to a client from elsewhere in your application use an [`IHubContext`](xref:signalr/hubcontext).
 > * Use `await` when calling asynchronous methods that depend on the hub staying alive. For example, a method such as `Clients.All.SendAsync(...)` can fail if it's called without `await` and the hub method completes before `SendAsync` finishes.
 
 ## The Context object
@@ -539,6 +543,7 @@ Create a hub by declaring a class that inherits from <xref:Microsoft.AspNetCore.
 > Hubs are [transient](/dotnet/core/extensions/dependency-injection#transient):
 >
 > * Don't store state in a property of the hub class. Each hub method call is executed on a new hub instance.
+> * Don't instantiate a hub directly via dependency injection. To send messages to a client from elsewhere in your application use an [`IHubContext`](xref:signalr/hubcontext).
 > * Use `await` when calling asynchronous methods that depend on the hub staying alive. For example, a method such as `Clients.All.SendAsync(...)` can fail if it's called without `await` and the hub method completes before `SendAsync` finishes.
 
 ## The Context object
@@ -634,11 +639,6 @@ public class ChatHub : Hub
 }
 ```
 
-> [!NOTE]
-> Using `InvokeAsync` from a Hub method requires setting the [`MaximumParallelInvocationsPerClient`](xref:signalr/configuration#configure-server-options) option to a value greater than 1.
->
-> This will be addressed in a future release. For more information, see [Support returning values from client invocations](https://github.com/dotnet/aspnetcore/issues/5280).
-
 The second way is to call `Client(...)` on an instance of [`IHubContext<T>`](xref:signalr/hubcontext):
 
 ```csharp
@@ -693,10 +693,13 @@ hubConnection.on("GetMessage", async () => {
 });
 ```
 
-> [!NOTE]
-> Client results don't work with the Azure SignalR Service.
->
-> This will be addressed in a future release. For more information, see [Support returning values from client invocations](https://github.com/dotnet/aspnetcore/issues/5280).
+#### Java client
+
+```java
+hubConnection.onWithResult("GetMessage", () -> {
+    return Single.just("message");
+});
+```
 
 ## Change the name of a hub method
 

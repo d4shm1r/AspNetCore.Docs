@@ -5,7 +5,7 @@ description: Learn how to host an ASP.NET Core app in a Windows Service.
 monikerRange: '>= aspnetcore-3.1'
 ms.author: riande
 ms.custom: mvc
-ms.date: 9/3/2022
+ms.date: 12/19/2022
 uid: host-and-deploy/windows-service
 ---
 # Host ASP.NET Core in a Windows Service
@@ -30,8 +30,7 @@ The ASP.NET Core Worker Service template provides a starting point for writing l
 
 ## App configuration
 
-[WebApplication.CreateBuilder](/dotnet/api/microsoft.aspnetcore.builder.webapplication.createbuilder) calls [AddWindowsService](https://source.dot.net/#Microsoft.Extensions.Hosting.WindowsServices/WindowsServiceLifetimeHostBuilderExtensions.cs,f8bfb38e255ef3b6,references)
-If the app is running as a Windows Service, `AddWindowsService`:
+Update Program.cs to call [AddWindowsService](https://source.dot.net/#Microsoft.Extensions.Hosting.WindowsServices/WindowsServiceLifetimeHostBuilderExtensions.cs,f8bfb38e255ef3b6,references). When the app is running as a Windows Service, `AddWindowsService`:
 
 * Sets the host lifetime to `WindowsServiceLifetime`.
 * Sets the [content root](xref:fundamentals/index#content-root) to [AppContext.BaseDirectory](xref:System.AppContext.BaseDirectory). For more information, see the [Current directory and content root](#current-directory-and-content-root) section.
@@ -82,7 +81,7 @@ If using the [Web SDK](#sdk), a *web.config* file, which is normally produced wh
 
 ```xml
 <PropertyGroup>
-  <TargetFramework>netcoreapp3.0</TargetFramework>
+  <TargetFramework>net7.0</TargetFramework>
   <IsTransformWebConfigDisabled>true</IsTransformWebConfigDisabled>
 </PropertyGroup>
 ```
@@ -406,7 +405,7 @@ If using the [Web SDK](#sdk), a *web.config* file, which is normally produced wh
 
 ```xml
 <PropertyGroup>
-  <TargetFramework>netcoreapp3.0</TargetFramework>
+  <TargetFramework>net6.0</TargetFramework>
   <IsTransformWebConfigDisabled>true</IsTransformWebConfigDisabled>
 </PropertyGroup>
 ```

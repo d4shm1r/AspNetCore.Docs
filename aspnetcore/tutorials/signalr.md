@@ -2,7 +2,8 @@
 title: Get started with ASP.NET Core SignalR
 author: bradygaster
 description: In this tutorial, you create a chat app that uses ASP.NET Core SignalR.
-ms.author: bradyg
+<!-- ms.author: bradyg -->
+ms.author: wpickett
 monikerRange: '>= aspnetcore-3.1'
 ms.custom: mvc
 ms.date: 11/21/2021
@@ -105,7 +106,7 @@ At the end, you'll have a working chat app:
 
 ## Add the SignalR client library
 
-The SignalR server library is included in the ASP.NET Core shared framework. The JavaScript client library isn't automatically included in the project. For this tutorial, use Library Manager (LibMan) to get the client library from [unpkg](https://unpkg.com/). `unpkg`is a fast, global content delivery network for everything on [npm](https://unpkg.com/). 
+The SignalR server library is included in the ASP.NET Core shared framework. The JavaScript client library isn't automatically included in the project. For this tutorial, use Library Manager (LibMan) to get the client library from [unpkg](https://unpkg.com/). `unpkg`is a fast, global content delivery network for everything on [npm](https://www.npmjs.com/). 
 
 # [Visual Studio](#tab/visual-studio/)
 
@@ -260,7 +261,7 @@ The preceding highlighted code adds SignalR to the ASP.NET Core dependency injec
 
 ## Publish to Azure
 
-For information on deploying to Azure, see [Quickstart: Deploy an ASP.NET web app](/azure/app-service/quickstart-dotnetcore).
+For information on deploying to Azure, see [Quickstart: Deploy an ASP.NET web app](/azure/app-service/quickstart-dotnetcore). For more information on Azure SignalR Service, see [What is Azure SignalR Service?](/azure/azure-signalr/signalr-overview).
 
 :::moniker-end
 
@@ -336,7 +337,7 @@ The SignalR server library is included in the ASP.NET Core 3.1 shared framework.
   * In **Solution Explorer**, right-click the project, and select **Add** > **Client-Side Library**.
   * In the **Add Client-Side Library** dialog, for **Provider** select **unpkg**.
   * For **Library**, enter `@microsoft/signalr@latest`.
-  * Select **Choose specific files**, expand the *dist/browser* folder, and select `signalr.js` and `signalr.js`.
+  * Select **Choose specific files**, expand the *dist/browser* folder, and select `signalr.js` and `signalr.min.js`.
   * Set **Target Location** to *wwwroot/js/signalr/*
   * Select **Install**
 
